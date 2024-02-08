@@ -69,9 +69,9 @@ class Msg:
 #
 class Pkt:
     def __init__(self, seqnum, acknum, checksum, payload):
-        self.seqnum = seqnum            # type: integer
-        self.acknum = acknum            # type: integer
-        self.checksum = checksum        # type: integer
+        self.seqnum = seqnum            # type: int
+        self.acknum = acknum            # type: int
+        self.checksum = checksum        # type: int
         self.payload = payload          # type: bytes[Msg.MSG_SIZE]
 
     def __str__(self):
