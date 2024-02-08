@@ -58,7 +58,7 @@ class Msg:
     MSG_SIZE = 20
 
     def __init__(self, data):
-        self.data = data                # type: bytes[MSG_SIZE]
+        self.data = data                # type: bytes[Msg.MSG_SIZE]
 
     def __str__(self):
         return 'Msg(data=%s)' % (self.data)
