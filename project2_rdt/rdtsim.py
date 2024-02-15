@@ -114,8 +114,8 @@ class EntityA:
     # Called from layer 5, passed the data to be sent to other side.
     # The argument `message` is a Msg containing the data to be sent.
     def output(self, message):
-        self.current_message = message.data
-        packet = Pkt(self.seqnum, self.seqnum, checksum(self.seqnum, self.acknum, message.data), message.data)
+        self.current_message = message
+        packet = Pkt(self.seqnum, self.seqnum, checksum(self.seqnum, self.seqnum, message.data), message.data)
         to_layer3(self, packet)
         start_timer(self, 10) # Set interrupt timer for longer than expected delay
         pass
@@ -133,7 +133,7 @@ class EntityA:
 
     # Called when A's timer goes off.
     def timer_interrupt(self):
-        self.output(self, self.current_message)# On timeout, we simply resend
+        self.output(self.current_message)# On timeout, we simply resend
         pass
 
 class EntityB:
@@ -152,12 +152,12 @@ class EntityB:
         if(packet.seqnum == self.seqnum and packet.checksum == checksum(packet.seqnum, packet.acknum, packet.payload)):
             final_message = Msg(packet.payload)
             to_layer5(self, final_message)
-            ack = Pkt(self.seqnum, 1, checksum(self.seqnum, self.acknum, packet.payload), 0)
+            ack = Pkt(self.seqnum, 1, checksum(self.seqnum, 1, packet.payload), 0)
             to_layer3(self, ack)
             self.seqnum = (self.seqnum + 1) % self.seqnum_limit
             pass
         else:
-            nack = Pkt(self.seqnum, 0, checksum(self.seqnum, self.acknum, packet.payload), 0)
+            nack = Pkt(self.seqnum, 0, checksum(self.seqnum, 0, packet.payload), 0)
             to_layer3(self, nack)
             pass
 
@@ -173,7 +173,7 @@ class EntityB:
 def checksum(seqnum, acknum, data) -> int:
     sum = 0
     for i in data:
-        sum += data
+        sum += i
     sum = sum + seqnum + acknum # Add seqnum and acknum
     sum = ~(sum % 256) # Truncate then invert
     return sum
