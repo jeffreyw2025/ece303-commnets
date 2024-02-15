@@ -114,10 +114,10 @@ class EntityA:
     # Called from layer 5, passed the data to be sent to other side.
     # The argument `message` is a Msg containing the data to be sent.
     def output(self, message):
-        self.current_message = message.data
-        packet = Pkt(self.seqnum, self.seqnum, checksum(self.seqnum, self.acknum, message.data), message.data)
+        self.current_message = message
+        packet = Pkt(self.seqnum, self.seqnum, checksum(self.seqnum, self.seqnum, message.data), message.data)
         to_layer3(self, packet)
-        start_timer(self, 10) # Set interrupt timer for longer than expected delay
+        start_timer(self, 25) # Set interrupt timer for longer than expected delay
         pass
 
     # Called from layer 3, when a packet arrives for layer 4 at EntityA.
@@ -125,6 +125,7 @@ class EntityA:
     def input(self, packet):
         # Note: We will use acknum = 1 for an ACK and 0 for a NACK
         if(packet.acknum == 1 and packet.seqnum == self.seqnum and packet.checksum == checksum(packet.seqnum, packet.acknum, packet.payload)): 
+            stop_timer(self)
             self.seqnum = (self.seqnum + 1) % self.seqnum_limit # Swaps between 0 and 1
             pass
         else:
@@ -133,7 +134,7 @@ class EntityA:
 
     # Called when A's timer goes off.
     def timer_interrupt(self):
-        self.output(self, self.current_message)# On timeout, we simply resend
+        self.output(self.current_message)# On timeout, we simply resend
         pass
 
 class EntityB:
@@ -152,12 +153,12 @@ class EntityB:
         if(packet.seqnum == self.seqnum and packet.checksum == checksum(packet.seqnum, packet.acknum, packet.payload)):
             final_message = Msg(packet.payload)
             to_layer5(self, final_message)
-            ack = Pkt(self.seqnum, 1, checksum(self.seqnum, self.acknum, packet.payload), 0)
+            ack = Pkt(self.seqnum, 1, checksum(self.seqnum, 1, packet.payload), packet.payload)
             to_layer3(self, ack)
             self.seqnum = (self.seqnum + 1) % self.seqnum_limit
             pass
         else:
-            nack = Pkt(self.seqnum, 0, checksum(self.seqnum, self.acknum, packet.payload), 0)
+            nack = Pkt(self.seqnum, 0, checksum(self.seqnum, 0, packet.payload), packet.payload)
             to_layer3(self, nack)
             pass
 
@@ -168,14 +169,14 @@ class EntityB:
 
 # This function performs the checksum for both EntityA and EntityB.
 # The checksum is performed as follows: Take the sum of all bytes, add the seqnum and ack values,
-# then truncate to 1 byte then peform a 1s complement. Adapted from P3 from Ch 3 of the textbook.
+# then truncate to 1 byte. Adapted from P3 from Ch 3 of the textbook.
     
 def checksum(seqnum, acknum, data) -> int:
     sum = 0
     for i in data:
-        sum += data
+        sum += i
     sum = sum + seqnum + acknum # Add seqnum and acknum
-    sum = ~(sum % 256) # Truncate then invert
+    sum = sum % 256 # Truncate to 8 bits
     return sum
 
 ###############################################################################
