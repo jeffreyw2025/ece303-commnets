@@ -1,0 +1,103 @@
+SIMULATION CONFIGURATION
+--------------------------------------
+(-n) # layer5 msgs to be provided:      11
+(-d) avg layer5 msg interarrival time:  1000.0
+(-z) transport protocol seqnum limit:   16
+(-l) layer3 packet loss prob:           0.1
+(-c) layer3 packet corruption prob:     0.3
+(-s) simulation random seed:            1708369679390695238
+--------------------------------------
+
+===== SIMULATION BEGINS
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+          TO_LAYER3: packet being corrupted
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+          TO_LAYER3: packet being lost
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+Message recieved successfully
+          TO_LAYER3: packet being lost
+Message sent from sender
+Error: Packet recieved out of order!
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+          TO_LAYER3: packet being corrupted
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+          TO_LAYER3: packet being lost
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+Error: Packet corrupted at reciever!
+          TO_LAYER3: packet being lost
+Message sent from sender
+Message recieved successfully
+          TO_LAYER3: packet being corrupted
+Error: Invalid acknowledgement at sender!
+Message sent from sender
+Error: Packet recieved out of order!
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+          TO_LAYER3: packet being lost
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+          TO_LAYER3: packet being lost
+Message sent from sender
+          TO_LAYER3: packet being lost
+Message sent from sender
+          TO_LAYER3: packet being lost
+Message sent from sender
+Message recieved successfully
+Message sent from sender
+          TO_LAYER3: packet being corrupted
+===== SIMULATION ENDS
+
+SIMULATION SUMMARY
+--------------------------------
+# layer5 msgs provided to A:      11
+# elapsed time units:             14174.755650566873
+
+# layer3 packets sent by A:       27
+# layer3 packets sent by B:       21
+# layer3 packets lost:            8
+# layer3 packets corrupted:       13
+# layer5 msgs delivered by A:     0
+# layer5 msgs delivered by B:     10
+# layer5 msgs by B/elapsed time:  0.0007054795332292083
+--------------------------------

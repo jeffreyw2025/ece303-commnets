@@ -106,7 +106,7 @@ class EntityA:
     # zero and seqnum_limit-1, inclusive.  E.g., if seqnum_limit is 16, then
     # all seqnums must be in the range 0-15.
     def __init__(self, seqnum_limit):
-        self.seqnum_limit = seqnum_limit
+        self.seqnum_limit = 2
         self.seqnum = 0
         self.current_message = 0
         pass
@@ -114,10 +114,11 @@ class EntityA:
     # Called from layer 5, passed the data to be sent to other side.
     # The argument `message` is a Msg containing the data to be sent.
     def output(self, message):
+        print("Message sent from sender")
         self.current_message = message
         packet = Pkt(self.seqnum, self.seqnum, checksum(self.seqnum, self.seqnum, message.data), message.data)
         to_layer3(self, packet)
-        start_timer(self, 25) # Set interrupt timer for longer than expected delay
+        start_timer(self, 20) # Set interrupt timer for longer than expected delay
         pass
 
     # Called from layer 3, when a packet arrives for layer 4 at EntityA.
@@ -129,12 +130,13 @@ class EntityA:
             self.seqnum = (self.seqnum + 1) % self.seqnum_limit # Swaps between 0 and 1
             pass
         else:
-            # Wait for timeout if corrupted, NACK, or mismatched seqnum
+            # Wait for timeout if corrupted or mismatched seqnum
+            print("Error: Invalid acknowledgement at sender!")
             pass
 
     # Called when A's timer goes off.
     def timer_interrupt(self):
-        self.output(self.current_message)# On timeout, we simply resend
+        self.output(self.current_message) # On timeout, we simply resend
         pass
 
 class EntityB:
@@ -143,7 +145,7 @@ class EntityB:
     #
     # See comment above `EntityA.__init__` for the meaning of seqnum_limit.
     def __init__(self, seqnum_limit):
-        self.seqnum_limit = seqnum_limit
+        self.seqnum_limit = 2
         self.seqnum = 0
         pass
 
@@ -151,6 +153,7 @@ class EntityB:
     # The argument `packet` is a Pkt containing the newly arrived packet.
     def input(self, packet):
         if(packet.seqnum == self.seqnum and packet.checksum == checksum(packet.seqnum, packet.acknum, packet.payload)):
+            print("Message recieved successfully")
             final_message = Msg(packet.payload)
             to_layer5(self, final_message)
             ack = Pkt(self.seqnum, 1, checksum(self.seqnum, 1, packet.payload), packet.payload)
@@ -158,7 +161,15 @@ class EntityB:
             self.seqnum = (self.seqnum + 1) % self.seqnum_limit
             pass
         else:
-            nack = Pkt(self.seqnum, 0, checksum(self.seqnum, 0, packet.payload), packet.payload)
+            if(packet.checksum != checksum(packet.seqnum, packet.acknum, packet.payload)):
+                print("Error: Packet corrupted at reciever!")
+            elif(packet.seqnum != self.seqnum):
+                print("Error: Packet recieved out of order!")
+            else:
+                print("Error: Something must have gone horribly wrong")
+            # Attempt to reacknowledge last message sent
+            old_seqnum = (self.seqnum + 1) % self.seqnum_limit
+            nack = Pkt(old_seqnum, 1, checksum(old_seqnum, 1, packet.payload), packet.payload)
             to_layer3(self, nack)
             pass
 
@@ -176,7 +187,7 @@ def checksum(seqnum, acknum, data) -> int:
     for i in data:
         sum += i
     sum = sum + seqnum + acknum # Add seqnum and acknum
-    sum = sum % 256 # Truncate to 8 bits
+    sum = 255 - (sum % 256) # Truncate to 8 bits then take 1s complement
     return sum
 
 ###############################################################################
