@@ -1,2 +1,2 @@
 # ece303-commnets
-Programs for the ECE-303: Communication Networks class
+Archive for programs for the ECE-303: Communication Networks class at the Cooper Union.
